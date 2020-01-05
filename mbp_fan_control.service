@@ -1,5 +1,5 @@
 [Unit]
-Description=Controls Fan speed on Macbook Pro
+Description=Controls Fan speed on Macbook 466
 
 [Service]
 Type=simple

@@ -1,34 +1,31 @@
 #!/bin/bash
-temp=`sensors | grep 'Physical id' | tr -s ' ' | cut -f 4 -d ' ' | cut -f 2 -d '+' | cut -f 1 -d '.'`
+# temp=`sensors | grep 'Physical id' | tr -s ' ' | cut -f 4 -d ' ' | cut -f 2 -d '+' | cut -f 1 -d '.'`
+temp=`sensors | grep 'Core 0' | awk '{print $3}' | cut -f 2 -d '+' | cut -f 1 -d '.'`
 adjusted=0
-if [ "$temp" -gt "79" ] ; then
+fan1Path='/sys/devices/platform/applesmc.768/fan1_min'
+if [ "$temp" -gt "70" ] ; then
     adjusted=1
-    echo 5300 > /sys/devices/platform/applesmc.768/fan1_min
-    echo 5300 > /sys/devices/platform/applesmc.768/fan2_min
+    echo 5300 > $fan1Path
 else
-    if [ "$temp" -gt "69" ] ; then
+    if [ "$temp" -gt "60" ] ; then
         adjusted=1
-        echo 4500 > /sys/devices/platform/applesmc.768/fan1_min
-        echo 4500 > /sys/devices/platform/applesmc.768/fan2_min
+        echo 4500 > $fan1Path
     else
-        if [ "$temp" -gt "59" ] ; then
+        if [ "$temp" -gt "50" ] ; then
             adjusted=1
-            echo 3700 > /sys/devices/platform/applesmc.768/fan1_min
-            echo 3700 > /sys/devices/platform/applesmc.768/fan2_min
+            echo 3800 > $fan1Path
         else
-            if [ "$temp" -gt "49" ] ; then
+            if [ "$temp" -gt "40" ] ; then
                 adjusted=1
-                echo 3000 > /sys/devices/platform/applesmc.768/fan1_min
-                echo 3000 > /sys/devices/platform/applesmc.768/fan2_min
+                echo 3200 > $fan1Path
             fi
         fi
     fi
 fi
 if [ "$adjusted" = "0" ] ; then
-    echo 2800 > /sys/devices/platform/applesmc.768/fan1_min
-    echo 2800 > /sys/devices/platform/applesmc.768/fan2_min
+    echo 2600 > $fan1Path
 fi
 echo "====" >> /tmp/mbp_fan_control.log
 date >> /tmp/mbp_fan_control.log
-cat /sys/devices/platform/applesmc.768/fan1_min >> /tmp/mbp_fan_control.log
+cat $fan1Path >> /tmp/mbp_fan_control.log
 echo temp: $temp >> /tmp/mbp_fan_control.log
